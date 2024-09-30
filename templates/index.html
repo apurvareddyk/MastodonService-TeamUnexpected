@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mastodon Service</title>
+  <!-- Link to Google Fonts for better typography -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,500&display=swap" rel="stylesheet">
+
+<!-- CSS code Written by Apurva -->
+  <style>
+    /* Reset some default browser styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #f4f6f8;
+      color: #333;
+      font-family: 'Roboto', sans-serif;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    h1 {
+      color: #2c3e50;
+      margin-bottom: 20px;
+      font-size: 32px;
+    }
+
+    h2 {
+      color: #2c3e50;
+      margin-top: 40px;
+      font-size: 28px;
+    }
+
+    .form-container {
+      background-color: #fff;
+      padding: 20px 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      margin-bottom: 30px;
+      width: 100%;
+      max-width: 500px;
+    }
+
+    form {
+      width: 100%;
+    }
+
+    form input[type="text"] {
+      padding: 12px 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      width: 100%;
+      margin-bottom: 15px;
+      font-size: 16px;
+      background-color: #fafafa;
+      color: #333;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    form input[type="text"]:focus {
+      border-color: #3498db;
+    }
+
+    button {
+      background-color: #3498db;
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 4px;
+      font-size: 16px;
+      border: none;
+      cursor: pointer;
+      margin: 5px;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #2980b9;
+    }
+
+    .button-group {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 30px;
+      margin-right: -150px;
+    }
+
+    .button-group form {
+      margin: 5px;
+    }
+
+    .button-group button {
+      width: 150px;
+    }
+
+    #result {
+      background-color: #fff;
+      padding: 20px 30px;
+      border-radius: 8px;
+      width: 100%;
+      max-width: 600px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+
+    .post-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .user-avatar {
+      background-color: #3498db;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      margin-right: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 24px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    .user-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .username {
+      color: #2c3e50;
+      font-size: 18px;
+      font-weight: 500;
+    }
+
+    .user-handle {
+      color: #7f8c8d;
+      font-size: 14px;
+    }
+
+    .post-content {
+      font-size: 16px;
+      color: #444;
+      margin-top: 10px;
+      line-height: 1.5;
+    }
+
+    .error-message {
+      color: #e74c3c;
+      margin-bottom: 20px;
+      font-size: 16px;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 600px) {
+      .form-container, #result {
+        padding: 15px 20px;
+      }
+
+      button {
+        width: 100%;
+        margin: 10px 0;
+      }
+
+      .button-group {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .button-group form {
+        width: 100%;
+      }
+
+      .button-group button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Mastodon Service</h1>
+
+  {% if error_message %}
+    <div class="error-message">
+      {{ error_message }}
+    </div>
+  {% endif %}
+
+  <!-- Create Post Form Code Written by Manjunath-->
+  <div class="form-container">
+    <form action="/create_post" method="post">
+      <input type="text" name="status" placeholder="What's on your mind?" required>
+      <button type="submit">Post</button>
+    </form>
+  </div>
+
+  <!-- Retrieve Post by ID Form Code Written by Manjunath -->
+  <div class="form-container">
+    <form action="/retrieve_post_by_id" method="post">
+      <input type="text" name="post_id" placeholder="Enter Post ID to Retrieve" required>
+      <button type="submit">Retrieve Post</button>
+    </form>
+  </div>
+
+  <!-- Button Group Code Written by Harshavardhan-->
+  <div class="button-group">
+    <form action="/retrieve_all_posts" method="get">
+      <button type="submit">View Timeline</button>
+    </form>
+
+    <form action="/delete_post" method="post">
+      <button type="submit">Delete My Post</button>
+    </form>
+  </div>
+
+  <!-- Display Created Post Code Written by Harshavardhan -->
+  {% if post %}
+    <div id="result">
+      <div class="post-header">
+        <div class="user-avatar">{{ (post.account.display_name[:1] or post.account.username[:1]).upper() }}</div>
+        <div class="user-info">
+          <span class="username">{{ post.account.display_name or post.account.username }}</span>
+          <span class="user-handle">@{{ post.account.acct }}</span>
+        </div>
+      </div>
+      <div class="post-content">{{ post.content | safe }}</div>
+      <p><strong>Post ID:</strong> {{ post.id }}</p>
+    </div>
+  {% endif %}
+
+  <!-- Display Retrieved Post by ID Code Written by Manjunath -->
+  {% if retrieved_post %}
+    <div id="result">
+      <div class="post-header">
+        <div class="user-avatar">{{ (retrieved_post.account.display_name[:1] or retrieved_post.account.username[:1]).upper() }}</div>
+        <div class="user-info">
+          <span class="username">{{ retrieved_post.account.display_name or retrieved_post.account.username }}</span>
+          <span class="user-handle">@{{ retrieved_post.account.acct }}</span>
+        </div>
+      </div>
+      <div class="post-content">{{ retrieved_post.content | safe }}</div>
+      <p><strong>Post ID:</strong> {{ retrieved_post.id }}</p>
+    </div>
+  {% endif %}
+
+  <!-- Display All Posts from Home Timeline Code Written by Harshavardhan -->
+  {% if all_posts %}
+    <h2>Your Timeline</h2>
+    {% for post in all_posts %}
+      <div id="result">
+        <div class="post-header">
+          <div class="user-avatar">{{ (post.account.display_name[:1] or post.account.username[:1]).upper() }}</div>
+          <div class="user-info">
+            <span class="username">{{ post.account.display_name or post.account.username }}</span>
+            <span class="user-handle">@{{ post.account.acct }}</span>
+          </div>
+        </div>
+        <div class="post-content">{{ post.content | safe }}</div>
+        <p><strong>Post ID:</strong> {{ post.id }}</p>
+      </div>
+    {% endfor %}
+  {% endif %}
+</body>
+</html>
+
